@@ -1,0 +1,52 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+  - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- checkout: self
+  persistCredentials: true
+  clean: true
+- task: NodeTool@0
+  inputs:
+    versionSpec: '18.x'
+    checkLatest: true
+    
+- script: npm install -g react-native-cli
+  displayName: 'Install React Native CLI'
+    
+- script: npm install
+  displayName: 'Install Dependencies'
+  
+# - task: Gradle@2
+#   displayName: 'Build APK'
+#   inputs:
+#     gradleWrapperFile: 'android/gradlew'
+#     workingDirectory: 'android/'
+#     tasks: 'build'
+#     publishJUnitResults: false
+#     javaHomeOption: 'JDKVersion'
+#     jdkVersionOption: 1.8
+#     gradleOptions: '-Xmx3072m'
+#     sonarQubeRunAnalysis: false
+
+- script: cd android && ./gradlew assembleRelease
+  displayName: 'Build Unsigned APKs'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: 'android/app/build/outputs/apk/release'
+    artifactName: 'android-apk'
+    publishLocation: 'Container'
+
+  
+
+  
+
+
